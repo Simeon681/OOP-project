@@ -123,7 +123,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CitySimulator.cpp" />
+    <ClCompile Include="Building.cpp" />
+    <ClCompile Include="City.cpp" />
+    <ClCompile Include="Developer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Miner.cpp" />
+    <ClCompile Include="Resident.cpp" />
+    <ClCompile Include="ResidentValues.cpp" />
+    <ClCompile Include="Teacher.cpp" />
+    <ClCompile Include="Unemployed.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Building.h" />
+    <ClInclude Include="City.h" />
+    <ClInclude Include="Developer.h" />
+    <ClInclude Include="Miner.h" />
+    <ClInclude Include="Resident.h" />
+    <ClInclude Include="ResidentValues.h" />
+    <ClInclude Include="Teacher.h" />
+    <ClInclude Include="Unemployed.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

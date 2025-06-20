@@ -1,7 +1,7 @@
 #include "Miner.h"
 
-Miner::Miner(const std::string name, Profession profession, uint8_t happiness, unsigned money, uint8_t life, uint16_t salary, uint16_t rent)
-    : Resident(name, profession, happiness, money, life, salary, rent)
+Miner::Miner(const std::string name, Profession profession, uint8_t happiness, unsigned money, uint8_t life, uint16_t salary)
+    : Resident(name, profession, happiness, money, life, salary)
 {}
 
 std::string Miner::getJob() const { return "Miner"; }

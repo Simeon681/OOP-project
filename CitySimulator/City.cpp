@@ -3,16 +3,49 @@
 City::City(unsigned n, unsigned m) 
 	: n(n), 
 	m(m),
-	buildings(n, std::vector<Building>(m))
+	date()
 {}
 
-void City::addBuilding(unsigned x, unsigned y, const Building & building)
+unsigned City::getHeight() const { return n; }
+unsigned City::getWidth() const { return m; }
+
+const Building& City::getBuilding(unsigned x, unsigned y) const {
+	if (x >= n || y >= m) {
+		throw std::out_of_range("Invalid building coordinates");
+	}
+	return const_cast<Building&>(buildings[x][y]);
+}
+
+Building& City::getBuilding(unsigned x, unsigned y) {
+	if (x >= n || y >= m) {
+		throw std::out_of_range("Invalid building coordinates");
+	}
+	return const_cast<Building&>(buildings[x][y]);
+}
+
+const std::vector<std::vector<Building>>& City::getBuildings() const { return buildings; }
+const MyDate& City::getDate() const { return date; }
+
+void City::addBuilding(unsigned x, unsigned y, Building & building)
 {
-	if (buildings[x][y].getCapacity() != 0) {
+	if (x >= n || y >= m) {
+		throw std::out_of_range("Invalid building coordinates");
+	}
+
+	if (building.getCapacity() == buildings.size()) {
+		throw std::invalid_argument("Building capacity is reached");
+	}
+
+	if (hasBuilding(x, y)) {
 		throw std::invalid_argument("Space already occupied by another building");
 	}
 
-	buildings[x][y] = building;
+	buildings[x][y] = std::move(building);;
+}
+
+bool City::hasBuilding(unsigned x, unsigned y) const
+{
+	return x < n && y < m && buildings[x][y].getCapacity() > 0;
 }
 
 void City::info() const
@@ -22,7 +55,7 @@ void City::info() const
 
 void City::info(std::ostream& os, unsigned x, unsigned y) const
 {
-	if (buildings[x][y].getCapacity() == 0) {
+	if (hasBuilding(x, y)) {
 		std::cout << "No building at (" << x << ", " << y << ")!";
 	} else {
 		os << buildings[x][y];
@@ -32,7 +65,7 @@ void City::info(std::ostream& os, unsigned x, unsigned y) const
 void City::info(unsigned x, unsigned y, std::string name) const
 {	
 	bool found = false;
-	if (buildings[x][y].getCapacity() == 0) {
+	if (hasBuilding(x, y)) {
 		std::cout << "No building at (" << x << ", " << y << ")!";
 	}
 	else {
@@ -50,10 +83,42 @@ void City::info(unsigned x, unsigned y, std::string name) const
 	}
 }
 
+void City::cityStepBack(int n)
+{
+	n *= -1;
+	for (unsigned i = 0; i < n; ++i) {
+		for (unsigned x = 0; x < n; ++x) {
+			for (unsigned y = 0; y < m; ++y) {
+				if (hasBuilding(x, y)) {
+					buildings[x][y].stepBackBuilding();
+				}
+			}
+		}
+		date.step(-1);
+	}
+}
+
+unsigned City::cityStepForward(int n)
+{
+	unsigned dead = 0;
+	for (unsigned i = 0; i < n; ++i) {
+		for (unsigned x = 0; x < n; ++x) {
+			for (unsigned y = 0; y < m; ++y) {
+				if (hasBuilding(x, y)) {
+					dead += buildings[x][y].stepForwardBuilding(date.isFirstDay(), date.isLastDay());
+				}
+			}
+		}
+		date.step(1);
+	}
+
+	return dead;
+}
+
 std::istream& operator>>(std::istream& is, City& city)
 {
 	unsigned numberOfBuildings;
-	return is >> city.n >> city.m >> numberOfBuildings;
+	is >> city.n >> city.m >> numberOfBuildings;
 
 	if (numberOfBuildings != city.n * city.m) {
 		throw std::invalid_argument("Invalid number of buildings");

@@ -1,9 +1,7 @@
 #include "Building.h"
 
-Building::Building(BuildingType type, unsigned x, unsigned y, unsigned capacity) 
+Building::Building(BuildingType type, unsigned capacity) 
 	: type(type),
-    x(x),
-    y(y),
     capacity(capacity)
 {
 	setBaseRent();
@@ -12,10 +10,10 @@ Building::Building(BuildingType type, unsigned x, unsigned y, unsigned capacity)
 std::string Building::getType() const
 {
     switch (type) {
-    case BuildingType::MODERN: return "Modern";
-    case BuildingType::PANEL: return "Panel";
-    case BuildingType::DORMITORY: return "Dormitory";
-    default: throw std::logic_error("Unknown type of building!");
+        case BuildingType::MODERN: return "Modern";
+        case BuildingType::PANEL: return "Panel";
+        case BuildingType::DORMITORY: return "Dormitory";
+        default: throw std::logic_error("Unknown type of building!");
     }
 }
 
@@ -45,7 +43,7 @@ void Building::setBaseRent()
     }
 }
 
-void Building::setRent(unsigned width, unsigned height) // do it more abstract
+void Building::setRent(unsigned x, unsigned y, unsigned width, unsigned height) // do it more abstract
 {
     double centerX = width / 2.0;
 	double centerY = height / 2.0;
@@ -62,8 +60,6 @@ void Building::setRent(unsigned width, unsigned height) // do it more abstract
 }
 
 unsigned Building::getCapacity() const { return capacity; }
-unsigned Building::getX() const { return x; }
-unsigned Building::getY() const { return y; }
 const std::vector<std::unique_ptr<Resident>>& Building::getResidents() const { return residents; }
 
 bool Building::addResident(std::unique_ptr<Resident> resident)
@@ -89,6 +85,29 @@ bool Building::removeResident(const std::string& name)
     return false;  
 }
 
+void Building::stepBackBuilding()
+{
+    for (unsigned i = 0; i < capacity; i++) {
+        if (residents[i]->stepBack() == 0) {
+			residents.erase(residents.begin() + i);
+        }
+	}
+}
+
+unsigned Building::stepForwardBuilding(bool isFirstDay, bool isLastDay)
+{
+	unsigned dead = 0;
+    for (unsigned i = 0; i < capacity; i++) {
+        residents[i]->dailyRoutine(isFirstDay, isLastDay, rent);
+        if (residents[i].get()->isDead()) {
+            dead++;
+			residents.erase(residents.begin() + i);
+        }
+    }
+
+    return dead;
+}
+
 std::istream& operator>>(std::istream& is, Building& building)
 {
     std::string type;
@@ -98,21 +117,21 @@ std::istream& operator>>(std::istream& is, Building& building)
 	building.setType(type);
 	is >> building.capacity >> size;
     
-    for (unsigned i = 0; i < size; i++) {
-        std::unique_ptr<Resident> resident = std::make_unique<Resident>();
-        is >> *resident;
-        building.addResident(std::move(resident));
-	}
+ //   for (unsigned i = 0; i < size; i++) {
+ //       //std::unique_ptr<Resident> resident = std::make_unique<Resident>();
+ //       is >> *resident;
+ //       building.addResident(std::move(resident));
+	//}
 	return is;
 }
 
 std::ostream& operator<<(std::ostream& os, const Building& building)
 {
-    os << building.getType() << building.capacity << building.residents.size() << std::endl;
+    os << building.getType() << ' ' << building.capacity << ' ' << building.residents.size() << std::endl;
     
     unsigned size = building.residents.size();
     for (unsigned i = 0; i < size; i++) {
-		os << building.residents[i];
+		os << *building.residents[i];
     }
     
     return os;

@@ -1,7 +1,7 @@
 #include "Teacher.h"
 
-Teacher::Teacher(const std::string name, Profession profession, uint8_t happiness, unsigned money, uint8_t life, uint16_t salary, uint16_t rent)
-    : Resident(name, profession, happiness, money, life, salary, rent)
+Teacher::Teacher(const std::string name, Profession profession, uint8_t happiness, unsigned money, uint8_t life, uint16_t salary)
+    : Resident(name, profession, happiness, money, life, salary)
 {}
 
 std::string Teacher::getJob() const { return "Teacher"; }

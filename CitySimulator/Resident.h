@@ -10,20 +10,21 @@ enum class Profession {
 
 class Resident {
 public:
-	Resident(const std::string& name, Profession profession, uint8_t happiness, unsigned money, uint8_t life, uint16_t salary, uint16_t rent);
+	Resident(const std::string& name, Profession profession, uint8_t happiness, unsigned money, uint8_t life, uint16_t salary);
 	virtual ~Resident() noexcept = default;
 
 	const std::string& getName() const;
 	uint16_t getSalary() const;
-	uint16_t getRent() const;
 	virtual std::string getJob() const = 0;
-	//virtual Profession stringToProfession(const std::string& proffesion) const = 0;
+	static Profession stringToProfession(const std::string& profession);
 
-	void dailyRoutine(bool isFirstDay, uint16_t rent);
+	void dailyRoutine(bool isFirstDay, bool isLastDay, uint16_t rent);
 	virtual void monthlyLife() = 0;
 	void monthlyRoutine();
 
 	void saveValues();
+	bool stepBack();
+	bool isDead() const;
 
 	virtual Resident* clone() const = 0;
 
@@ -35,6 +36,5 @@ protected:
 	ResidentValues currentValues;
 	std::vector<ResidentValues> residentHistory;
 	uint16_t salary;
-	uint16_t rent;
 };
 
